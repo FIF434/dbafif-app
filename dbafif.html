@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FileVault Pro | Afif Faturahman</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-glow: rgba(99,102,241,0.3);
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f0f1a;
+            --darker: #07070f;
+            --glass: rgba(30, 30, 50, 0.7);
+            --glass-border: rgba(255,255,255,0.08);
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, var(--primary-glow) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(5deg); }
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+            box-shadow: 0 10px 25px var(--primary-glow);
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .logo p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 16px;
+        }
+
+        .input-icon input {
+            width: 100%;
+            background: rgba(10,10,20,0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 14px 16px 14px 46px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .input-icon input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        .switch-mode {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .switch-mode a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .alert-error {
+            background: rgba(239,68,68,0.15);
+            border: 1px solid var(--danger);
+            color: #f87171;
+        }
+
+        .alert-success {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid var(--success);
+            color: #34d399;
+        }
+
+        .app-container {
+            display: none;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 16px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .navbar-brand h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .navbar-brand span {
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(99,102,241,0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(10,10,20,0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 12px 20px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            color: var(--primary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            margin-right: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary);
+        }
+
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .preview-modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .preview-container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            width: 90%;
+            max-width: 1100px;
+            height: 85%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-content {
+            flex: 1;
+            overflow: auto;
+            padding: 24px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--success);
+            padding: 14px 24px;
+            border-radius: 16px;
+            z-index: 2001;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .badge {
+            background: rgba(99,102,241,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--primary);
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(10,10,20,0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 12px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-animation"></div>
+
+<!-- Login Container -->
+<div class="login-container" id="authContainer">
+    <div class="glass-card">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h1>FileVault Pro</h1>
+            <p>by <strong>Afif Faturahman</strong></p>
+        </div>
+
+        <div id="authMessage"></div>
+
+        <div id="loginForm">
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginUsername" placeholder="Username" value="admin">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Password" value="admin123">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="loginBtn">Login</button>
+            <div class="switch-mode">
+                <a id="showRegister">Belum punya akun? <strong>Daftar</strong></a>
+            </div>
+        </div>
+
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="regUsername" placeholder="Username">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="regEmail" placeholder="Email (opsional)">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="regPassword" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-check-circle"></i>
+                    <input type="password" id="regConfirm" placeholder="Konfirmasi Password">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="registerBtn">Daftar</button>
+            <div class="switch-mode">
+                <a id="showLogin">Sudah punya akun? <strong>Login</strong></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div class="app-container" id="appContainer">
+    <div class="navbar">
+        <div class="navbar-brand">
+            <div class="icon"><i class="fas fa-database"></i></div>
+            <div>
+                <h2>FileVault <span>Pro</span></h2>
+                <div style="font-size: 11px; color: var(--text-dim);">Afif Faturahman • Database Manager</div>
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="user-badge">
+                <i class="fas fa-user-circle"></i>
+                <span id="currentUsername">User</span>
+            </div>
+            <button class="btn-icon" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="tabs" id="tabsContainer">
+        <button class="tab active" data-category="semua"><i class="fas fa-folder"></i> Semua</button>
+        <button class="tab" data-category="excel"><i class="fas fa-file-excel"></i> Excel</button>
+        <button class="tab" data-category="word"><i class="fas fa-file-word"></i> Word</button>
+        <button class="tab" data-category="pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+        <button class="tab" data-category="gambar"><i class="fas fa-image"></i> Gambar</button>
+    </div>
+
+    <div class="main-grid">
+        <div class="panel">
+            <div class="panel-title">
+                <i class="fas fa-cloud-upload-alt"></i> Upload File
+            </div>
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-file-upload"></i>
+                <div>Klik atau drag & drop file di sini</div>
+                <div style="font-size: 11px; margin-top: 6px;">Excel, Word, PDF, Gambar, Text</div>
+            </div>
+            <input type="file" id="fileInput" style="display:none;" multiple>
+
+            <div class="form-group">
+                <label><i class="fas fa-tags"></i> Tag / Label</label>
+                <input type="text" id="tags" placeholder="pisah koma, contoh: laporan,2024">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Deskripsi</label>
+                <textarea id="deskripsi" rows="2" placeholder="Keterangan file..."></textarea>
+            </div>
+            <button class="btn btn-primary" id="uploadBtn" style="width:100%;"><i class="fas fa-upload"></i> Upload</button>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <i class="fas fa-table-list"></i> Daftar File
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Cari file...">
+            </div>
+            <div class="table-wrapper">
+                <table id="fileTable">
+                    <thead>
+                        <tr><th>#</th><th>File</th><th>Tipe</th><th>Size</th><th>Tag</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="tableBody"><tr><td colspan="6"><div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div></td></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="preview-modal" id="previewModal">
+    <div class="preview-container">
+        <div class="preview-header">
+            <strong id="previewFileName"><i class="fas fa-file"></i> Preview</strong>
+            <button class="btn-icon" id="closePreview"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div class="preview-content" id="previewContent">Loading...</div>
+    </div>
+</div>
+
+<script>
+    // ============ DATABASE USERS (FIXED) ============
+    const USERS_KEY = 'filevault_users_v2';
+    let currentUser = null;
+    let allFiles = [];
+    let currentCategory = 'semua';
+
+    // Initialize default users
+    function initUsers() {
+        const existing = localStorage.getItem(USERS_KEY);
+        if (!existing) {
+            const defaultUsers = {
+                'admin': {
+                    password: 'admin123',
+                    email: 'admin@filevault.com',
+                    files: []
+                },
+                'afif': {
+                    password: 'afif123',
+                    email: 'afif@filevault.com',
+                    files: []
+                }
+            };
+            localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
+        }
+    }
+
+    function getUsers() {
+        const users = localStorage.getItem(USERS_KEY);
+        return users ? JSON.parse(users) : {};
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    // Register
+    function register(username, email, password) {
+        const users = getUsers();
+        if (users[username]) {
+            showAuthMessage('Username sudah digunakan!', 'error');
+            return false;
+        }
+        users[username] = {
+            password: password,
+            email: email,
+            files: []
+        };
+        saveUsers(users);
+        showAuthMessage('Registrasi berhasil! Silakan login.', 'success');
+        return true;
+    }
+
+    // Login - FIXED! Compare plain text
+    function login(username, password) {
+        const users = getUsers();
+        const user = users[username];
+        
+        console.log('Login attempt:', username, password);
+        console.log('User found:', user);
+        
+        if (!user) {
+            showAuthMessage('Username tidak ditemukan!', 'error');
+            return false;
+        }
+        
+        if (user.password !== password) {
+            showAuthMessage('Password salah!', 'error');
+            return false;
+        }
+        
+        currentUser = username;
+        localStorage.setItem('filevault_current_user', username);
+        allFiles = user.files || [];
+        
+        document.getElementById('currentUsername').innerText = username;
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'block';
+        
+        renderStats();
+        renderTable();
+        
+        showToast('Login berhasil! Selamat datang ' + username);
+        return true;
+    }
+
+    function logout() {
+        localStorage.removeItem('filevault_current_user');
+        currentUser = null;
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('appContainer').style.display = 'none';
+        document.getElementById('loginUsername').value = 'admin';
+        document.getElementById('loginPassword').value = 'admin123';
+    }
+
+    function showAuthMessage(msg, type) {
+        const container = document.getElementById('authMessage');
+        container.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        setTimeout(() => container.innerHTML = '', 3000);
+    }
+
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
+    // File Operations
+    function saveUserFiles() {
+        const users = getUsers();
+        if (users[currentUser]) {
+            users[currentUser].files = allFiles;
+            saveUsers(users);
+        }
+    }
+
+    function saveFileToUser(fileData) {
+        allFiles.push(fileData);
+        saveUserFiles();
+        renderStats();
+        renderTable();
+    }
+
+    function deleteFileFromUser(id) {
+        allFiles = allFiles.filter(f => f.id !== id);
+        saveUserFiles();
+        renderStats();
+        renderTable();
+    }
+
+    // Helper Functions
+    function formatSize(bytes) {
+        if (!bytes) return '0 B';
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    function getFileType(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (['xlsx', 'xls', 'csv'].includes(ext)) return 'excel';
+        if (['docx', 'doc'].includes(ext)) return 'word';
+        if (['pdf'].includes(ext)) return 'pdf';
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) return 'gambar';
+        if (['txt', 'json', 'xml', 'html', 'md'].includes(ext)) return 'text';
+        return 'lainnya';
+    }
+
+    function getFileIcon(type) {
+        const icons = { excel: '📊', word: '📝', pdf: '📄', gambar: '🖼️', text: '📃', lainnya: '📁' };
+        return icons[type] || '📁';
+    }
+
+    function renderStats() {
+        const excel = allFiles.filter(f => f.tipe === 'excel').length;
+        const word = allFiles.filter(f => f.tipe === 'word').length;
+        const pdf = allFiles.filter(f => f.tipe === 'pdf').length;
+        const gambar = allFiles.filter(f => f.tipe === 'gambar').length;
+        const totalSize = allFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+        
+        document.getElementById('statsGrid').innerHTML = `
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-database"></i></div><div class="stat-label">Total File</div><div class="stat-number">${allFiles.length}</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-hdd"></i></div><div class="stat-label">Total Size</div><div class="stat-number">${formatSize(totalSize)}</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-excel"></i></div><div class="stat-label">Excel</div><div class="stat-number">${excel}</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-word"></i></div><div class="stat-label">Word</div><div class="stat-number">${word}</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-pdf"></i></div><div class="stat-label">PDF</div><div class="stat-number">${pdf}</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-image"></i></div><div class="stat-label">Gambar</div><div class="stat-number">${gambar}</div></div>
+        `;
+    }
+
+    function renderTable() {
+        let filtered = [...allFiles];
+        if (currentCategory !== 'semua') {
+            filtered = filtered.filter(f => f.tipe === currentCategory);
+        }
+        const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        if (search) {
+            filtered = filtered.filter(f => f.nama.toLowerCase().includes(search) || (f.tags && f.tags.toLowerCase().includes(search)));
+        }
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6"><div style="text-align:center; padding:40px;"><i class="fas fa-folder-open"></i> Tidak ada file</div></td></tr>';
+            return;
+        }
+        
+        filtered.forEach((f, i) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><span style="font-size:20px;">${getFileIcon(f.tipe)}</span> ${escapeHtml(f.nama)}</td>
+                    <td><span class="badge">${f.tipe}</span></td>
+                    <td>${formatSize(f.size)}</td>
+                    <td><span style="font-size:11px;">${escapeHtml(f.tags || '-')}</span></td>
+                    <td>
+                        <button class="btn-icon" onclick="previewFile(${f.id})"><i class="fas fa-eye"></i></button>
+                        <button class="btn-icon" onclick="downloadFile(${f.id})"><i class="fas fa-download"></i></button>
+                        <button class="btn-icon" onclick="deleteFileById(${f.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
+    }
+
+    // Preview File
+    window.previewFile = async function(id) {
+        const file = allFiles.find(f => f.id === id);
+        if (!file) return;
+        
+        document.getElementById('previewFileName').innerHTML = `<i class="fas fa-file"></i> ${file.nama}`;
+        const contentDiv = document.getElementById('previewContent');
+        contentDiv.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        document.getElementById('previewModal').classList.add('active');
+
+        const binary = atob(file.data);
+        const byteArray = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) byteArray[i] = binary.charCodeAt(i);
+
+        if (file.tipe === 'excel') {
+            const workbook = XLSX.read(byteArray, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const html = XLSX.utils.sheet_to_html(sheet);
+            contentDiv.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; background:#0b0d15; border-radius:12px;">${html}</table></div>`;
+        } else if (file.tipe === 'word') {
+            const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const arrayBuffer = await blob.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+            contentDiv.innerHTML = `<pre style="white-space:pre-wrap; background:rgba(0,0,0,0.3); padding:16px; border-radius:16px;">${escapeHtml(result.value)}</pre>`;
+        } else if (file.tipe === 'pdf') {
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            contentDiv.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none; min-height:500px;"></iframe>`;
+        } else if (file.tipe === 'gambar') {
+            contentDiv.innerHTML = `<img src="data:${file.mime};base64,${file.data}" style="max-width:100%; border-radius:16px;">`;
+        } else {
+            const text = new TextDecoder('utf-8').decode(byteArray);
+            contentDiv.innerHTML = `<pre style="white-space:pre-wrap; background:rgba(0,0,0,0.3); padding:16px; border-radius:16px;">${escapeHtml(text)}</pre>`;
+        }
+    };
+
+    window.downloadFile = function(id) {
+        const file = allFiles.find(f => f.id === id);
+        if (file) {
+            const link = document.createElement('a');
+            link.href = `data:${file.mime};base64,${file.data}`;
+            link.download = file.nama;
+            link.click();
+        }
+    };
+
+    window.deleteFileById = function(id) {
+        if (confirm('Hapus file ini?')) {
+            deleteFileFromUser(id);
+            showToast('File dihapus');
+        }
+    };
+
+    // Upload Files
+    async function uploadFiles(files, tags, deskripsi) {
+        for (const file of files) {
+            const tipe = getFileType(file.name);
+            const reader = new FileReader();
+            await new Promise((resolve) => {
+                reader.onload = async (e) => {
+                    const base64 = e.target.result.split(',')[1];
+                    saveFileToUser({
+                        id: Date.now() + Math.random(),
+                        nama: file.name,
+                        size: file.size,
+                        mime: file.type,
+                        tipe: tipe,
+                        tags: tags,
+                        deskripsi: deskripsi,
+                        tanggal: new Date().toISOString(),
+                        data: base64
+                    });
+                    resolve();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        showToast(`${files.length} file diupload`);
+    }
+
+    // Event Listeners
+    initUsers();
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        login(username, password);
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', () => {
+        const username = document.getElementById('regUsername').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirm').value;
+        
+        if (!username || !password) {
+            showAuthMessage('Username dan password wajib diisi!', 'error');
+            return;
+        }
+        if (password !== confirm) {
+            showAuthMessage('Password tidak sama!', 'error');
+            return;
+        }
+        register(username, email, password);
+    });
+
+    document.getElementById('showRegister').addEventListener('click', () => {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+    });
+
+    document.getElementById('showLogin').addEventListener('click', () => {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('closePreview').addEventListener('click', () => document.getElementById('previewModal').classList.remove('active'));
+    document.getElementById('uploadArea').addEventListener('click', () => document.getElementById('fileInput').click());
+    document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+    
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        const tags = document.getElementById('tags').value;
+        const deskripsi = document.getElementById('deskripsi').value;
+        uploadFiles(files, tags, deskripsi);
+        document.getElementById('fileInput').value = '';
+    });
+
+    document.getElementById('searchInput').addEventListener('input', () => renderTable());
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCategory = tab.getAttribute('data-category');
+            renderTable();
+        });
+    });
+
+    // Drag & Drop
+    const uploadArea = document.getElementById('uploadArea');
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = '#6366f1'; });
+    uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = 'var(--glass-border)'; });
+    uploadArea.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--glass-border)';
+        const files = Array.from(e.dataTransfer.files);
+        const tags = document.getElementById('tags').value;
+        const deskripsi = document.getElementById('deskripsi').value;
+        await uploadFiles(files, tags, deskripsi);
+    });
+
+    // Check saved session
+    const savedUser = localStorage.getItem('filevault_current_user');
+    if (savedUser) {
+        const users = getUsers();
+        if (users[savedUser]) {
+            currentUser = savedUser;
+            allFiles = users[savedUser].files || [];
+            document.getElementById('currentUsername').innerText = currentUser;
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            renderStats();
+            renderTable();
+        }
+    }
+</script>
+</body>
+</html>
